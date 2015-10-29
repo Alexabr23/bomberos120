@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Page fields feature.
+ */
+
+include_once 'page_fields.features.inc';

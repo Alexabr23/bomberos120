@@ -1,0 +1,25 @@
+@media -sass-debug-info{filename{font-family:file\:\/\/D\:\/work\/wamp\/www\/metro-blocks\/sites\/all\/themes\/metroblocks\/scss\/components\/calendar\.scss}line{font-family:\000033}}
+.calendar-calendar .month-view .full td.multi-day div.monthview,
+.calendar-calendar .week-view .full td.multi-day div.weekview,
+.calendar-calendar .day-view .full td.multi-day div.dayview {
+  background: #74A5D7;
+  border-radius: 0;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/D\:\/work\/wamp\/www\/metro-blocks\/sites\/all\/themes\/metroblocks\/scss\/components\/calendar\.scss}line{font-family:\000038}}
+.calendar-calendar td {
+  border: 1px solid #EEEEEE;
+  color: #777777;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  vertical-align: top;
+  width: 14%;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/D\:\/work\/wamp\/www\/metro-blocks\/sites\/all\/themes\/metroblocks\/scss\/components\/calendar\.scss}line{font-family:\0000321}}
+.calendar-calendar table tr.even,
+.calendar-calendar table tr.alt,
+.calendar-calendar table tr:nth-of-type(2n) {
+  background: none;
+}

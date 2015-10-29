@@ -1,0 +1,428 @@
+<?php
+
+function mym_field_get_value( $node, $field, $imagestyle = 'thumbnail' ){
+  
+  if(!is_object($node)){
+    $node = node_load($node);
+  }
+  $items = field_get_items('node', $node, $field);
+  
+  
+  if(isset($items[0]['safe_value'])){
+    return $items[0]['safe_value'];  // if it's a text (like body field)
+    
+  }elseif(isset($items[0]['rgb'])){  // if it's a color
+    return $items[0]['rgb'];
+    
+  }elseif(isset($items[0]['value'])){
+    return $items[0]['value'];
+    
+  }elseif(isset($items[0]['fid'])){  // if it's a file
+    
+    if($imagestyle == 'original'){
+      return file_create_url($items[0]['uri']);
+    }else{
+      return image_style_url($imagestyle, $items[0]['uri']);
+    }    
+    
+  }
+}
+
+
+function flatmetro_base_init() {
+  drupal_add_js('misc/jquery.form.js');
+  drupal_add_library('system', 'drupal.ajax');
+  
+}
+
+/**
+ * Implements hook_menu().
+ */
+function flatmetro_base_menu() {
+  // A menu callback is required when using ajax outside of the Form API.
+  $items['ajax-node'] = array(
+    'page callback' => 'ajax_link_response',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function ajax_link_response($type = 'ajax', $nid = 0) {
+  $output = views_embed_view('projects', 'block_1', $nid);
+  if ($type == 'ajax') {
+    $commands = array();
+    $commands[] = ajax_command_replace('#project-info', '<div id="project-info"><i class="icon-remove back"></i>' . $output . '</div>');
+    $commands[] = ajax_command_invoke(NULL, "after_ajax");
+    $page = array(
+      '#type' => 'ajax',
+      '#commands' => $commands
+    );
+    ajax_deliver($page);
+  }
+  else {
+    $output = '<div id="project-info"><i class="icon-remove back"></i>' . $output . '</div>';
+    return $output;
+  }
+}
+
+
+/**
+ * Implements hook_block_configure().
+ */
+/*function mymoun_base_block_configure($delta='') {
+  $form = array();
+ dsm($delta);
+ dsm('----------');
+  switch($delta) {
+    case 'my_block' :
+      // Text field form element
+      $form['text_body'] = array(
+        '#type' => 'text_format',
+        '#title' => t('Enter your text here in WYSIWYG format'),
+        '#default_value' => variable_get('text_variable', ''),
+      );
+ 
+      // File selection form element
+      $form['file'] = array(
+        '#name' => 'block_image',
+        '#type' => 'managed_file',
+        '#title' => t('Choose an Image File'),
+        '#description' => t('Select an Image for the custom block.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('block_image_fid', ''),
+        '#upload_location' => 'public://block_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+      break;
+  }
+  return $form;
+}*/
+function mymoun_base_block_configure($delta = '') {
+  dsm('----------/*');
+  if ($delta == 'recent') {
+    $form['blog_block_count'] = array(
+      '#type' => 'select',
+      '#title' => t('Number of recent blog posts to display'),
+      '#default_value' => variable_get('blog_block_count', 10),
+      '#options' => drupal_map_assoc(array(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30)),
+    );
+    return $form;
+  }
+}
+
+/**
+ * replace the old jquery form by the new version
+ */
+function mymoun_base_js_alter(&$javascript) {
+  
+  
+  /*$a0 = arg(0);
+  $a1 = arg(1);
+  $a2 = arg(2);
+  //if($a0 == "admin" && $a1 == "structure" && $a2 == "md-slider"){
+    dsm($a1);
+    
+    unset($javascript["sites/all/modules/jquery_update/replace/ui/ui/minified/jquery.ui.core.min.js"]);
+    unset($javascript["sites/all/modules/jquery_update/replace/ui/ui/minified/jquery.ui.tabs.min.js"]);
+  //}
+  dsm($javascript);*/
+  
+  /*unset($javascript["misc/jquery.form.js"]);
+  print($javascript);*/
+  //drupal_add_js(drupal_get_path('module', 'flatmetro_base').'/js/jquery.form.js');
+}
+
+
+function mymoun_base_init() {
+  //dsm(drupal_get_path('module', 'mymoun_base'));
+  //drupal_add_css(drupal_get_path('module', 'mymoun_base') . '/css/style.css');
+  
+}
+
+/*function mymoun_base_js_alter(&$javascript) {
+  dsm($javascript);
+  print('fffffffffffffffffffffff');
+  /*if ($some_condition) {
+    $js_path = drupal_get_path('theme', 'mytheme') . "/page-download.js";
+    if (isset($js[$js_path])) {
+      unset($js[$js_path]);
+    }
+  }*/
+//}*/
+
+function mymoun_base_preprocess_page(&$variables) {
+  
+  /*dsm($variables);
+
+  drupal_add_js('misc/ui/jquery.ui.core.min.js');
+  drupal_add_js('misc/ui/jquery.ui.tabs.min.js');
+  dsm($variables);*/
+}
+/*
+function mymoun_base_preprocess_html(&$vars) {
+    dsm($vars);
+}*/
+
+function mymoun_base_form_alter(&$form, &$form_state, $form_id) {
+  
+    
+   switch ($form_id) {
+    case 'system_theme_settings':   // theme settings
+      $form['zurb_foundation']['color'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Backgrounds settings'),
+        '#weight' => -2,
+      );  
+      
+      if(isset($form['color'])){          
+        $form['zurb_foundation']['color'] = $form['color'];      
+        unset($form['color']); 
+      }
+    break;
+    
+    
+      // CSS file
+      drupal_add_css(drupal_get_path('module', 'mymoun_base') . '/css/style.css');
+      drupal_add_css(drupal_get_path('module', 'mymoun_base') . '/css/style.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
+  /*
+      $form['page_settings'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Page settings'),
+        '#group' => 'additional_settings',        
+        '#description' => t(''),
+        '#weight' => -10,
+      );
+      
+      $form['page_settings']['header_settings'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Header settings'),
+        '#collapsed' => FALSE,
+        '#collapsible' => TRUE,
+        //'#group' => 'additional_settings',        
+        '#description' => t(''),
+        '#weight' => 10,
+      );
+      */
+      // show background settings is "show header" is checked.
+      $form['#groups']['group_header_settings']->states['expanded'][':input[name="field_page_show_header[und]"]'] = array('checked' => TRUE);
+      
+      dsm( $form['#groups']['group_header_settings'] );
+      dsm( $form );
+      
+      $form['page_settings']['header_settings']['#states']['expanded'][':input[name="field_page_show_header[und]"]'] = array('checked' => TRUE);
+      
+      $form['field_header_bg_img']['#states']['visible'][':input[name="field_page_header_background[und]"]'] = array('value' => 'image');
+      
+      $form['field_page_subtitle']['#states']['visible'][':input[name="field_page_show_header[und]"]'] = array('checked' => TRUE);
+      $form['field_page_show_breadcrumbs']['#states']['visible'][':input[name="field_page_show_header[und]"]'] = array('checked' => TRUE);
+      /*
+      
+      $form['page_settings']['field_page_layout'] = $form['field_page_layout'];    
+      //unset($form['field_page_layout']);   
+         
+      $form['page_settings']['field_page_show_header'] = $form['field_page_show_header'];
+      //unset($form['field_page_show_header']);
+      
+      $form['page_settings']['header_settings']['field_page_header_background'] = $form['field_page_header_background'];    
+      //unset($form['field_page_header_background']);
+      
+      $form['page_settings']['header_settings']['field_page_bgcolor'] = $form['field_page_bgcolor'];    
+      //unset($form['field_page_bgcolor']);
+      
+      $form['page_settings']['header_settings']['field_header_bg_img'] = $form['field_header_bg_img'];    
+      //unset($form['field_header_bg_img']);
+         
+      $form['page_settings']['header_settings']['field_page_subtitle'] = $form['field_page_subtitle'];
+      //unset($form['field_page_subtitle']);   
+         
+      $form['page_settings']['header_settings']['field_page_show_breadcrumbs'] = $form['field_page_show_breadcrumbs'];
+      //unset($form['field_page_show_breadcrumbs']);  
+          */
+    break;
+    
+    default:
+      break;
+  }
+}
+
+
+/*-------------------------------------------------------------------------*/
+function mymoun_base_install() {
+  // Check if our field is not already created.
+  if (!field_info_field('field_myField')) {
+
+    // Create the field base.
+    $field = array(
+      'field_name' => 'field_myField', 
+      'type' => 'text', 
+    );
+    field_create_field($field);
+
+    // Create the field instance on the bundle.
+    $instance = array(
+      'field_name' => 'field_myField', 
+      'entity_type' => 'user', 
+      'label' => 'My Field Name', 
+      'bundle' => 'user', 
+      // If you don't set the "required" property then the field wont be required by default.
+      'required' => TRUE,
+      'settings' => array(
+        // Here you inform either or not you want this field showing up on the registration form.
+        'user_register_form' => 1,
+      ),
+      'widget' => array(
+        'type' => 'textfield',
+      ), 
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function mymoun_base_enable() {
+    // Check if our field is not already created.
+  if (!field_info_field('field_myField')) {
+        
+    $field = array(
+      'field_name' => 'field_page_layout',
+      'foreign keys' => array(),
+      'indexes' => array(
+        'value' => array(
+          0 => 'value',
+        ),
+      ),
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values' => array(
+          1 => 'Layout 1',
+          2 => 'Layout 2',
+          3 => 'Layout 3',
+          4 => 'Layout 4',
+          5 => 'Layout 5',
+        ),
+      ),
+      'type' => 'list_text',
+    );    
+    field_create_field($field);
+
+    $instance = array(
+      'bundle' => 'page',
+      'default_value' => array(
+        0 => array(
+          'value' => 1,
+        ),
+      ),
+      'deleted' => 0,
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'list',
+          'settings' => array(),
+          'type' => 'list_default',
+          'weight' => 3,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_page_layout',
+      'label' => 'Page layout',
+      'required' => 1,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'options',
+        'settings' => array(),
+        'type' => 'options_buttons',
+        'weight' => 3,
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  // Check if our field is not already created.
+  /* if (!field_info_field('field_page_layout')) {
+      // Exported field_base: 'field_homepage_position'
+    $field['field_page_layout'] = array(
+      'active' => 1,
+      'cardinality' => 1,
+      'deleted' => 0,
+      'entity_types' => array(),
+      'field_name' => 'field_page_layout',
+      'foreign keys' => array(),
+      'indexes' => array(
+        'value' => array(
+          0 => 'value',
+        ),
+      ),
+      'locked' => 0,
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values' => array(
+          1 => 'Layout 1',
+          2 => 'Layout 2',
+          3 => 'Layout 3',
+          4 => 'Layout 4',
+        ),
+        'allowed_values_function' => '',
+      ),
+      'translatable' => 0,
+      'type' => 'list_text',
+    );
+    
+    field_info_cache_clear();
+    
+    field_create_field($field);
+    
+      // Exported field_instance: 'node-page-field_homepage_position'
+    $field_instances['node-page-field_page_layout'] = array(
+      'bundle' => 'page',
+      'default_value' => NULL,
+      'deleted' => 0,
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'list',
+          'settings' => array(),
+          'type' => 'list_default',
+          'weight' => 3,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_page_layout',
+      'label' => 'Page layout',
+      'required' => 0,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'options',
+        'settings' => array(),
+        'type' => 'options_buttons',
+        'weight' => 3,
+      ),
+    );
+  
+    field_create_instance($field_instances); 
+  } */
+}

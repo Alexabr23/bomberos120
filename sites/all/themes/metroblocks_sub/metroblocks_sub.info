@@ -1,0 +1,60 @@
+name = Metro-Blocks sub
+description = A sub-theme of Metro-Blocks. 
+core = 7.x
+engine = phptemplate
+
+base theme = metroblocks
+
+; Call style sheets.
+stylesheets[all][] = css/style.css
+
+regions[header_top_left]     = Header Top Left
+regions[header_top_right]    = Header Top Right
+regions[slider]              = Slider
+regions[header]              = Header
+regions[help]                = Help
+regions[highlighted]         = Highlighted
+regions[featured]            = Featured
+regions[wide_region]         = Wide Region
+regions[before_content]      = Before Content
+regions[content]             = Content
+regions[sidebar_first]       = Left Sidebar
+regions[sidebar_second]      = Right Sidebar
+regions[triptych_first]      = Callout one
+regions[triptych_middle]     = Callout two
+regions[triptych_last]       = Callout three
+regions[before_footer]       = Before footer
+regions[footer_firstcolumn]  = Footer one
+regions[footer_secondcolumn] = Footer two
+regions[footer_thirdcolumn]  = Footer three
+regions[footer_fourthcolumn] = Footer four
+regions[footer]              = Footer
+
+
+
+; Theme settings:
+
+; Top Bar.
+settings[zurb_foundation_top_bar_enable] = 1
+settings[zurb_foundation_top_bar_grid] = 1
+settings[zurb_foundation_top_bar_sticky] = 1
+settings[zurb_foundation_top_bar_menu_text] = 'Menu'
+settings[zurb_foundation_top_bar_custom_back_text] = 1
+settings[zurb_foundation_top_bar_back_text] = 'Back'
+settings[zurb_foundation_top_bar_is_hover] = 1
+settings[zurb_foundation_top_bar_scrolltop] = 1
+
+; Tooltips.
+settings[zurb_foundation_tooltip_enable] = 1
+settings[zurb_foundation_tooltip_position] = 'top'
+settings[zurb_foundation_tooltip_mode] = 'text'
+settings[zurb_foundation_tooltip_text] = 'More information?'
+settings[zurb_foundation_tooltip_touch] = 0
+
+; Styles and Scripts.
+settings[zurb_foundation_disable_core_css] = 0
+
+; Misc.
+settings[zurb_foundation_html_tags] = 1
+settings[zurb_foundation_messages_modal] = 0
+settings[zurb_foundation_pager_center] = 1

@@ -1,0 +1,8 @@
+name = Mymoun Menu Icon
+description = Module add icons to menu items.
+core = 7.x
+package = Mymoun
+project = "mymoun_base"
+
+
+;stylesheets[all][] = css/style.css

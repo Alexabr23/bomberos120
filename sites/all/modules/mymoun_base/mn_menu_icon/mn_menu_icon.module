@@ -1,0 +1,54 @@
+<?php
+/**
+ * Implementation of hook_form_FROM_ID_alter()
+ * Description changed, added nolink and separator as path types.
+ */
+function mn_menu_icon_form_menu_edit_item_alter(&$form, &$form_state) {
+  $pattern = '/\.(fa-(?:\w+(?:-)?)+):before\s+{\s*content:\s*"(.+)";\s+}/';
+  $subject = file_get_contents('http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css');
+  
+  preg_match_all($pattern, $subject, $matches, PREG_SET_ORDER);
+
+  $icons = array();
+  $icons[] = t('---- None ----');
+  foreach($matches as $match){
+    $icons[$match[1]] = $match[1];
+  }
+  asort($icons);
+  
+  $options = unserialize(db_query('SELECT options FROM {menu_links} WHERE mlid = :mlid', array(':mlid' => $form['mlid']['#value']))->fetchField());
+  
+  $form['menu_icon_awesome'] = array(
+    '#type' => 'select',
+    '#title' => t('Icon'),
+    "#description" => "",
+    '#options' => $icons, 
+    '#default_value' => isset($options['menu_icon_awesome']) ? $options['menu_icon_awesome'] : '0',
+    '#weight' => 1,
+  );
+  
+  $form['#submit'][] = 'mn_menu_icon_form_menu_submit';
+}
+
+function mn_menu_icon_form_menu_submit($form, &$form_state) {
+  
+  $options = unserialize(db_query('SELECT options FROM {menu_links} WHERE mlid = :mlid', array(':mlid' => $form_state['values']['mlid']))->fetchField());
+  
+  $options['menu_icon_awesome'] = $form_state['values']['menu_icon_awesome'];
+  
+  if (!isset($options['attributes'])) {
+    $options['attributes'] = array();
+  }
+  
+  db_update('menu_links')
+        ->fields(array(
+          'options' => serialize($options),
+        ))
+        ->condition('mlid', $form_state['values']['mlid'])
+        ->execute();
+  
+  cache_clear_all('*', 'cache_menu', TRUE);
+  //menu_router_build(TRUE);
+  //menu_cache_clear_all();
+   
+}

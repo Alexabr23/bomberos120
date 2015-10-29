@@ -1,0 +1,12 @@
+name = Mymoun base module
+description = Module provides advanced features to Mymoun's themes.
+core = 7.x
+package = Mymoun
+
+
+dependencies[] = color_field
+dependencies[] = features
+dependencies[] = page_fields
+
+
+stylesheets[all][] = css/style.css
